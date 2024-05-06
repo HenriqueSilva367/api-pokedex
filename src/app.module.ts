@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { UsuarioController } from './usuario.controller';
 
+import { PokemonsModule } from './pokemons/pokemons.module';
+import { PrismaService } from './database/prisma.service';
 @Module({
-  imports: [],
-  controllers: [UsuarioController],
-  providers: [],
+  imports: [PokemonsModule],
+  controllers: [],
+  providers: [PrismaService],
 })
 export class AppModule {}
