@@ -3,9 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { PokemonsService } from './pokemons.service';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
@@ -27,12 +27,12 @@ export class PokemonsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.pokemonsService.findOne(+id);
+    return this.pokemonsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePokemonDto: UpdatePokemonDto) {
-    return this.pokemonsService.update(+id, updatePokemonDto);
+  @Put(':id')
+  update(@Param('id') id: string, @Body() data: UpdatePokemonDto) {
+    return this.pokemonsService.update(id, data);
   }
 
   @Delete(':id')

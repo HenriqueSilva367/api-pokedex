@@ -36,16 +36,30 @@ export class PokemonsService {
   }
 
   findAll() {
-    return `This action returns all pokemons`;
+    return this.prisma.pokemon.findMany();
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} pokemon`;
   }
 
-  update(id: number, updatePokemonDto: UpdatePokemonDto) {
-    return `This action updates a #${id} pokemon`;
-    console.log(updatePokemonDto);
+  async update(id: string, data: UpdatePokemonDto) {
+    const pokemonExists = await this.prisma.pokemon.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!pokemonExists) {
+      throw new Error('Pokemon does not exists!');
+    }
+
+    return await this.prisma.pokemon.update({
+      data,
+      where: {
+        id,
+      },
+    });
   }
 
   remove(id: number) {
