@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePokemonDto } from './dto/create-pokemon.dto';
-import { UpdatePokemonDto } from './dto/update-pokemon.dto';
+
 import { PrismaService } from 'src/database/prisma.service';
+import { PokemonDto } from './dto/pokemon.dto';
 
 @Injectable()
 export class PokemonsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreatePokemonDto) {
+  async create(data: PokemonDto) {
     const pokemonExists = await this.prisma.pokemon.findFirst({
       where: {
         name: data.name,
@@ -43,7 +43,7 @@ export class PokemonsService {
     return `This action returns a #${id} pokemon`;
   }
 
-  async update(id: string, data: UpdatePokemonDto) {
+  async update(id: string, data: PokemonDto) {
     const pokemonExists = await this.prisma.pokemon.findUnique({
       where: {
         id,
@@ -62,7 +62,19 @@ export class PokemonsService {
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pokemon`;
+  async delete(id: string) {
+    const pokemonExists = await this.prisma.pokemon.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!pokemonExists) {
+      throw new Error('Pokemon does not exists!');
+    }
+    return await this.prisma.pokemon.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

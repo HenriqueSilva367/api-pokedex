@@ -1,4 +1,4 @@
-export class CreatePokemonDto {
+export class PokemonDto {
   name: string;
   imgUrl: string;
   peso: number;
