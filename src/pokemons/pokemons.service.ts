@@ -1,5 +1,8 @@
-import { Injectable } from '@nestjs/common';
-
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { PokemonDto } from './dto/pokemon.dto';
 
@@ -15,7 +18,17 @@ export class PokemonsService {
     });
 
     if (pokemonExists) {
-      throw new Error('Pokemon already exists');
+      throw new ConflictException('Pokemon already exists');
+    }
+
+    const categoria = await this.prisma.category.findFirst({
+      where: {
+        name: data.categoriaName,
+      },
+    });
+
+    if (!categoria) {
+      throw new NotFoundException(`Category '${data.categoriaName}' not found`);
     }
 
     const pokemon = await this.prisma.pokemon.create({
@@ -29,14 +42,44 @@ export class PokemonsService {
         defesa: data.defesa,
         sp_ataque: data.sp_ataque,
         sp_defesa: data.sp_defesa,
-        velocitade: data.velocitade,
+        velocidade: data.velocidade,
+        category: {
+          connect: { id: categoria.id },
+        },
+      },
+      include: {
+        category: true,
       },
     });
+
     return pokemon;
   }
 
-  findAll() {
-    return this.prisma.pokemon.findMany();
+  async findAll() {
+    const pokemons = await this.prisma.pokemon.findMany({
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return pokemons.map((pokemon) => ({
+      id: pokemon.id,
+      name: pokemon.name,
+      imgUrl: pokemon.imgUrl,
+      peso: pokemon.peso,
+      altura: pokemon.altura,
+      hp: pokemon.hp,
+      ataque: pokemon.ataque,
+      defesa: pokemon.defesa,
+      sp_ataque: pokemon.sp_ataque,
+      sp_defesa: pokemon.sp_defesa,
+      velocidade: pokemon.velocidade,
+      categoria: pokemon.category.name,
+    }));
   }
 
   findOne(id: string) {
@@ -51,11 +94,24 @@ export class PokemonsService {
     });
 
     if (!pokemonExists) {
-      throw new Error('Pokemon does not exists!');
+      throw new NotFoundException('Pokemon does not exists!');
+    }
+
+    const categoria = await this.prisma.category.findFirst({
+      where: {
+        name: data.categoriaName,
+      },
+    });
+
+    if (!categoria) {
+      throw new NotFoundException(`Category '${data.categoriaName}' not found`);
     }
 
     return await this.prisma.pokemon.update({
-      data,
+      data: {
+        ...data,
+        categoryId: categoria.id,
+      },
       where: {
         id,
       },
@@ -68,9 +124,11 @@ export class PokemonsService {
         id,
       },
     });
+
     if (!pokemonExists) {
-      throw new Error('Pokemon does not exists!');
+      throw new NotFoundException('Pokemon does not exists!');
     }
+
     return await this.prisma.pokemon.delete({
       where: {
         id,

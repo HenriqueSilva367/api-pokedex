@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,8 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model pokemon {
-  id         String    @id @default(uuid())
+model Pokemon {
+  id         String   @id @default(uuid())
   name       String
   imgUrl     String
   peso       Float
@@ -24,7 +18,13 @@ model pokemon {
   defesa     Int
   sp_ataque  Int
   sp_defesa  Int
-  velocitade Int
-  created_at DateTime?
-  updated_at DateTime?
+  velocidade Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  pokemons Pokemon[]
 }
