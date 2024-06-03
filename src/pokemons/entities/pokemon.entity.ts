@@ -8,5 +8,5 @@ export class Pokemon {
   defesa: number;
   sp_ataque: number;
   sp_defesa: number;
-  velocitade: number;
+  velocidade: number;
 }

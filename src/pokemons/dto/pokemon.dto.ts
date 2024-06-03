@@ -8,5 +8,6 @@ export class PokemonDto {
   defesa: number;
   sp_ataque: number;
   sp_defesa: number;
-  velocitade: number;
+  velocidade: number;
+  categoriaName: string;
 }
