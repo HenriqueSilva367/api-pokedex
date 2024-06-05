@@ -67,7 +67,7 @@ export class CategoriasService {
       });
 
       if (!categoriaExiste) {
-        throw new Error('Categoria does not exist!');
+        throw new Error('Categoria não existe');
       }
 
       return await this.prisma.category.delete({
@@ -76,7 +76,7 @@ export class CategoriasService {
         },
       });
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.error('Error ao deletar categoria:', error);
       throw new Error('Internal server error');
     }
   }

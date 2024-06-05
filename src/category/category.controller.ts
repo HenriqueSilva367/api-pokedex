@@ -1,4 +1,3 @@
-// src/category/category.controller.ts
 import {
   Controller,
   Post,
