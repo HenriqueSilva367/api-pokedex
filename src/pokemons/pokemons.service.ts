@@ -83,35 +83,51 @@ export class PokemonsService {
   }
 
   async update(id: string, data: PokemonDto) {
-    const pokemonExists = await this.prisma.pokemon.findUnique({
-      where: {
-        id,
-      },
-    });
+    try {
+      const pokemon = await this.prisma.pokemon.findUnique({
+        where: {
+          id,
+        },
+      });
 
-    if (!pokemonExists) {
-      throw new Error('Pokemon não existe!');
+      if (!pokemon) {
+        throw new Error('Pokémon não encontrado');
+      }
+
+      const categoria = await this.prisma.category.findFirst({
+        where: {
+          name: data.categoriaName,
+        },
+      });
+
+      if (!categoria) {
+        throw new Error(`Categoria '${data.categoriaName}' não encontrada`);
+      }
+
+      const updatedPokemon = await this.prisma.pokemon.update({
+        data: {
+          name: data.name,
+          imgUrl: data.imgUrl,
+          peso: data.peso,
+          altura: data.altura,
+          hp: data.hp,
+          ataque: data.ataque,
+          defesa: data.defesa,
+          sp_ataque: data.sp_ataque,
+          sp_defesa: data.sp_defesa,
+          velocidade: data.velocidade,
+          categoryId: categoria.id,
+        },
+        where: {
+          id,
+        },
+      });
+
+      return updatedPokemon;
+    } catch (error) {
+      console.error('Erro ao atualizar Pokémon:', error);
+      throw new Error('Erro ao atualizar Pokémon');
     }
-
-    const categoria = await this.prisma.category.findFirst({
-      where: {
-        name: data.categoriaName,
-      },
-    });
-
-    if (!categoria) {
-      throw new Error(`Categoria '${data.categoriaName}' não existe`);
-    }
-
-    return await this.prisma.pokemon.update({
-      data: {
-        ...data,
-        categoryId: categoria.id,
-      },
-      where: {
-        id,
-      },
-    });
   }
 
   async delete(id: string) {
